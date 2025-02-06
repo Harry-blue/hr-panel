@@ -35,8 +35,18 @@ Replace your_secret_key_here and your-generated-secret-key with secure values.
 
 ```bash
 npm install
-npm run dev
+```
 
+### Setup prisma
+
+```bash
+npx prisma generate
+```
+
+### Run Project
+
+```bash
+npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
