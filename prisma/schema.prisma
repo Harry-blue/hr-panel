@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  email       String       @unique
+  password    String
+  role        Role
+  name        String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  admin       Admin?
+  interviewer Interviewer?
+  candidate   Candidate?
+}
+
+enum Role {
+  ADMIN
+  INTERVIEWER
+  CANDIDATE
+}
+
+model Admin {
+  id         Int         @id @default(autoincrement())
+  user       User        @relation(fields: [userId], references: [id])
+  userId     Int         @unique
+  interviews Interview[]
+}
+
+model Interviewer {
+  id             Int         @id @default(autoincrement())
+  user           User        @relation(fields: [userId], references: [id])
+  userId         Int         @unique
+  specialization String?
+  interviews     Interview[]
+  feedbacks      Feedback[]
+}
+
+model Candidate {
+  id         Int         @id @default(autoincrement())
+  user       User        @relation(fields: [userId], references: [id])
+  userId     Int         @unique
+  resume     String?
+  interviews Interview[]
+  feedbacks  Feedback[]
+}
+
+model Interview {
+  id            Int             @id @default(autoincrement())
+  candidate     Candidate       @relation(fields: [candidateId], references: [id])
+  candidateId   Int
+  interviewer   Interviewer     @relation(fields: [interviewerId], references: [id])
+  interviewerId Int
+  admin         Admin           @relation(fields: [adminId], references: [id])
+  adminId       Int
+  scheduledAt   DateTime
+  status        InterviewStatus
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  feedback      Feedback?
+}
+
+enum InterviewStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+model Feedback {
+  id            Int         @id @default(autoincrement())
+  interview     Interview   @relation(fields: [interviewId], references: [id])
+  interviewId   Int         @unique
+  interviewer   Interviewer @relation(fields: [interviewerId], references: [id])
+  interviewerId Int
+  candidate     Candidate   @relation(fields: [candidateId], references: [id])
+  candidateId   Int
+  rating        Int
+  comments      String      @db.Text
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Notification {
+  id        Int              @id @default(autoincrement())
+  userId    Int
+  message   String
+  type      NotificationType
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+}
+
+enum NotificationType {
+  EMAIL
+  SMS
+}
