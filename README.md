@@ -1,17 +1,42 @@
+# Next.js Project - HR Panel
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+Ensure you have the following installed on your machine:
+
+- Node.js: v20.18.0
+- npm, yarn, pnpm, or bun (choose your preferred package manager)
+
+### Clone the Repository
 
 ```bash
+git clone https://github.com/Harry-blue/hr-panel.git
+cd hr-panel
+```
+
+## Set Up Environment Variables
+
+Create a .env file in the root directory and add the following variables:
+
+```bash
+DATABASE_URL="mysql://root:dolphine@localhost:3306/devin"
+JWT_SECRET=your_secret_key_here
+NEXTAUTH_SECRET="your-generated-secret-key"
+NEXTAUTH_URL="http://localhost:3000"
+```
+
+Replace your_secret_key_here and your-generated-secret-key with secure values.
+
+### Installation dependency
+
+```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
