@@ -42,25 +42,6 @@ export default function SignIn() {
     mode: "onChange",
   });
 
-  // Handle session changes and navigation
-  useEffect(() => {
-    if (status === "authenticated" && session?.user?.role) {
-      switch (session.user.role) {
-        case "ADMIN":
-          router.push("/admin/dashboard");
-          break;
-        case "INTERVIEWER":
-          router.push("/interviewer/dashboard");
-          break;
-        case "CANDIDATE":
-          router.push("/candidate/dashboard");
-          break;
-        default:
-          router.push("/");
-      }
-    }
-  }, [session, status, router]);
-
   const onSubmit = async (data: SignInFormValues) => {
     setIsLoading(true);
     setError("");
