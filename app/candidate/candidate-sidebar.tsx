@@ -1,6 +1,5 @@
 import { Calendar, Home, Mail, User } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 import {
   Sidebar,
@@ -21,8 +20,6 @@ const menuItems = [
 ];
 
 export function CandidateSidebar() {
-  const pathname = usePathname();
-
   return (
     <Sidebar>
       <SidebarHeader className="flex items-center justify-between px-4 py-2">
@@ -33,7 +30,7 @@ export function CandidateSidebar() {
         <SidebarMenu>
           {menuItems.map((item) => (
             <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton asChild isActive={pathname === item.href}>
+              <SidebarMenuButton asChild>
                 <Link href={item.href} className="flex items-center gap-2">
                   <item.icon className="h-4 w-4" />
                   <span>{item.title}</span>
