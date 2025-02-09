@@ -41,9 +41,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased ${poppins.variable} ${playfair.variable} font-sans`}
       >
-        <NextAuthProvider>
-          <SidebarProvider>{children}</SidebarProvider>
-        </NextAuthProvider>
+        <NextAuthProvider>{children}</NextAuthProvider>
       </body>
     </html>
   );
