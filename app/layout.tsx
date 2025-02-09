@@ -1,19 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Playfair_Display, Poppins } from "next/font/google";
+import { Playfair_Display, Poppins } from "next/font/google";
 import "./globals.css";
 
 import { NextAuthProvider } from "@/components/NextAuthWrapper";
 import { SidebarProvider } from "@/components/ui/sidebar";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -38,9 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased ${poppins.variable} ${playfair.variable} font-sans`}
-      >
+      <body className={` ${poppins.variable} ${playfair.variable} font-sans`}>
         <NextAuthProvider>{children}</NextAuthProvider>
       </body>
     </html>
