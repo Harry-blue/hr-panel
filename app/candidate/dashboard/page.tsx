@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 import SignOutButton from "@/components/SignOutButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { CheckCircle, Clock } from "lucide-react";
+import { authOptions } from "@/lib/auth";
 
 export default async function CandidateDashboard() {
   const session = await getServerSession(authOptions);

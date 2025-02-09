@@ -8,12 +8,6 @@ export async function GET() {
         return new Response(JSON.stringify({ error: "Error fetching feedbacks" }), { status: 500 })
     }
 }
-
-export async function GET_ID(request: Request) {
-    const { feedbackId } = await request.json()
-    const feedback = await prisma.feedback.findUnique({ where: { id: feedbackId } })
-    return new Response(JSON.stringify(feedback), { status: 200 })
-}
  
  
 export async function POST(request: Request) {

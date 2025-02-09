@@ -9,11 +9,7 @@ export async function GET(){
     }
 }
 
-export async function GET_ID(request:Request){
-    const { interviewId } = await request.json()
-    const interview = await prisma.interview.findUnique({ where: { id: interviewId } })
-    return new Response(JSON.stringify(interview), { status: 200 })
-}
+
 
 export async function POST(request:Request){
     try{

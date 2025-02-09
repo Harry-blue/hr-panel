@@ -44,10 +44,10 @@ const Header = () => {
                 </button>
               </motion.div>
             ))}
-            <Link href="/login" className="btn-secondary">
+            <Link href={{ pathname: "/login" }} className="btn-secondary">
               Login
             </Link>
-            <Link href="/sign-up" className="btn-primary">
+            <Link href={{ pathname: "/login" }} className="btn-primary">
               Sign Up
             </Link>
           </div>
@@ -78,13 +78,13 @@ const Header = () => {
               </button>
             ))}
             <Link
-              href="/login"
+              href={{ pathname: "/login" }}
               className="block w-full text-center py-2 btn-secondary"
             >
               Login
             </Link>
             <Link
-              href="/sign-up"
+              href={{ pathname: "/login" }}
               className="block w-full text-center py-2 btn-primary"
             >
               Sign Up

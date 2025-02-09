@@ -32,7 +32,10 @@ export function InterviewerSidebar() {
           {menuItems.map((item) => (
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton asChild>
-                <Link href={item.href} className="flex items-center gap-2">
+                <Link
+                  href={{ pathname: item.href }}
+                  className="flex items-center gap-2"
+                >
                   <item.icon className="h-4 w-4" />
                   <span>{item.title}</span>
                 </Link>

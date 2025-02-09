@@ -10,11 +10,7 @@ export async function GET(){
     }
 }
 
-export async function GET_ID(request:Request){
-    const { userId } = await request.json()
-    const user = await prisma.user.findUnique({ where: { id: userId } })
-    return new Response(JSON.stringify(user), { status: 200 })
-}
+
 
 export async function POST(request:Request){
     try{
