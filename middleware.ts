@@ -7,7 +7,7 @@ export async function middleware(request: NextRequest) {
   const session = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
 
   // Define public and protected routes
-  const publicPaths = ['/login', '/sign-up', '/forgot-password']
+  const publicPaths = ['/login', '/sign-up', '/forgot-password','/']
   const isPublicPath = publicPaths.includes(path) || path === '/'
   const isApiRoute = path.startsWith('/api')
 
@@ -29,6 +29,9 @@ export async function middleware(request: NextRequest) {
     if (!isCorrectPath) {
       return NextResponse.redirect(new URL(`${rolePath}/dashboard`, request.url))
     }
+  }
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    return NextResponse.next()
   }
 
   return NextResponse.next()

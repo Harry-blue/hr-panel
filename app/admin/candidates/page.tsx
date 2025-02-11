@@ -1,48 +1,56 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import Header from "@/components/layout/header";
+import { Main } from "@/components/layout/main";
+import { CandidateTable } from "./components/candidate-table";
+import { CandidateActions } from "./components/candidate-actions";
 
-export default function CandidatesPage() {
+async function getCandidatesData(session: any) {
+  const response = await fetch(
+    `${process.env.NEXTAUTH_URL}/api/admin/candidates`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-User-Id": session.user.id,
+        "X-User-Role": session.user.role,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch candidates data");
+  }
+
+  return response.json();
+}
+
+export default async function CandidatesPage() {
+  const session = await getServerSession(authOptions);
+  if (!session || session.user.role !== "ADMIN") {
+    redirect("/auth/signin");
+  }
+
+  const candidatesData = await getCandidatesData(session);
+
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Candidate Management</h1>
-        <Button>Add Candidate</Button>
+    <>
+      <div className="">
+        <Header />
+        <Main>
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h1 className="text-3xl font-bold">Candidate Management</h1>
+              <CandidateActions session={session} />
+            </div>
+            <CandidateTable
+              initialCandidates={candidatesData.candidates}
+              session={session}
+            />
+          </div>
+        </Main>
       </div>
-      <div className="flex items-center space-x-2">
-        <Input placeholder="Search candidates..." className="max-w-sm" />
-        <Button variant="outline">Search</Button>
-      </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow>
-            <TableCell>John Doe</TableCell>
-            <TableCell>john@example.com</TableCell>
-            <TableCell>Pending</TableCell>
-            <TableCell>
-              <Button variant="outline" size="sm">
-                Edit
-              </Button>
-            </TableCell>
-          </TableRow>
-          {/* Add more rows as needed */}
-        </TableBody>
-      </Table>
-    </div>
+    </>
   );
 }
