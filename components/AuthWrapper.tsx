@@ -11,6 +11,7 @@ export default function AuthWrapper({
   children: React.ReactNode;
 }) {
   const { data: session, status } = useSession();
+
   const router = useRouter();
 
   useEffect(() => {
@@ -31,7 +32,7 @@ export default function AuthWrapper({
       }
     } else if (status === "unauthenticated") {
       // Redirect to login page if not authenticated
-      router.push("/login");
+      router.push("/");
     }
   }, [session, status, router]);
 

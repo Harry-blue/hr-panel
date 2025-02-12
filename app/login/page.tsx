@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,6 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
+import { signIn } from "next-auth/react";
 
 const signInSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -28,7 +28,7 @@ type SignInFormValues = z.infer<typeof signInSchema>;
 
 export default function SignIn() {
   const router = useRouter();
-  const { data: session, status } = useSession();
+
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -57,6 +57,7 @@ export default function SignIn() {
         setError(result.error);
       }
       // Don't navigate here - let the useEffect handle it
+      router.push("/admin/dashboard");
     } catch (error) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
@@ -67,11 +68,6 @@ export default function SignIn() {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-
-  // If already authenticated, don't render the form
-  if (status === "authenticated") {
-    return null;
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20 p-4">

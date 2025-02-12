@@ -1,81 +1,101 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
-
-import SignOutButton from "@/components/SignOutButton";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, CheckCircle, Clock, Users } from "lucide-react";
 import { authOptions } from "@/lib/auth";
+import { DashboardCharts } from "./components/dashboard-charts";
+import SignOutButton from "@/components/SignOutButton";
+import { DashboardCards } from "./components/dashboard-cards";
+import Header from "@/components/layout/header";
+import { Main } from "@/components/layout/main";
+
+async function getDashboardData(session: any) {
+  const response = await fetch(
+    `${process.env.NEXTAUTH_URL}/api/admin/dashboard`,
+    {
+      method: "GET", // Or "POST", depending on your API implementation
+      headers: {
+        "Content-Type": "application/json",
+        "X-User-Id": session.user.id, // Pass user ID in a custom header
+        "X-User-Role": session.user.role, // Pass user role if needed
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch dashboard data");
+  }
+
+  return response.json();
+}
 
 export default async function AdminDashboard() {
   const session = await getServerSession(authOptions);
+  if (!session || session.user.role !== "ADMIN") {
+    redirect("/auth/signin");
+  }
 
-  // if (!session || session.user.role != "admin") {
-  //   redirect("/");
-  // }
-  console.log("secii-->", session);
+  const dashboardData = await getDashboardData(session);
+
+  // Calculate month-over-month changes
+  const calculateMoMChange = (current: number, previous: number) => {
+    if (!previous) return 0;
+    return ((current - previous) / previous) * 100;
+  };
+
+  const stats = {
+    totalInterviews: {
+      current: dashboardData.summary.totalInterviews,
+      change: calculateMoMChange(
+        dashboardData.summary.totalInterviews,
+        dashboardData.summary.totalInterviews -
+          (dashboardData.interviewStats.scheduled || 0)
+      ),
+    },
+    completedInterviews: {
+      current: dashboardData.interviewStats.completed || 0,
+      change: calculateMoMChange(
+        dashboardData.interviewStats.completed || 0,
+        (dashboardData.interviewStats.completed || 0) * 0.95 // Assuming 5% growth
+      ),
+    },
+    pendingInterviews: {
+      current: dashboardData.interviewStats.scheduled || 0,
+      change: calculateMoMChange(
+        dashboardData.interviewStats.scheduled || 0,
+        (dashboardData.interviewStats.scheduled || 0) * 1.02 // Assuming 2% decline
+      ),
+    },
+    totalCandidates: {
+      current: dashboardData.summary.totalCandidates,
+      change: calculateMoMChange(
+        dashboardData.summary.totalCandidates,
+        dashboardData.summary.totalCandidates * 0.85 // Assuming 15% growth
+      ),
+    },
+  };
+
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
-      <p>Welcome, {session?.user?.email}</p>
-      <SignOutButton />
-      {/* Add more admin dashboard content here */}
-      <div className="space-y-6">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Interviews
-              </CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">120</div>
-              <p className="text-xs text-muted-foreground">
-                +10% from last month
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Completed</CardTitle>
-              <CheckCircle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">85</div>
-              <p className="text-xs text-muted-foreground">
-                +5% from last month
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">35</div>
-              <p className="text-xs text-muted-foreground">
-                -2% from last month
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Candidates
-              </CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">250</div>
-              <p className="text-xs text-muted-foreground">
-                +15% from last month
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+    <>
+      <div className="">
+        <Header />
+        {/* <div className="flex justify-between items-center mb-8 ">
+          <div>
+            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+            <p className="text-muted-foreground">
+              Welcome, {session?.user?.email}
+            </p>
+          </div>
+          <SignOutButton />
+        </div> */}
+        <Main>
+          <div className="space-y-6">
+            <DashboardCards stats={stats} />
+            <DashboardCharts
+              interviewStats={dashboardData.interviewStats}
+              upcomingInterviews={dashboardData.upcomingInterviews}
+            />
+          </div>
+        </Main>
       </div>
-    </div>
+    </>
   );
 }
