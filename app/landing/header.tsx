@@ -47,7 +47,7 @@ const Header = () => {
             <Link href={{ pathname: "/login" }} className="btn-secondary">
               Login
             </Link>
-            <Link href={{ pathname: "/login" }} className="btn-primary">
+            <Link href={{ pathname: "/register" }} className="btn-primary">
               Sign Up
             </Link>
           </div>

@@ -17,9 +17,13 @@ export default async function InterViewerDashboard() {
   console.log("secii-->", session);
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Interview Dashboard</h1>
-      <p>Welcome, {session?.user?.email}</p>
+      <div className="flex ">
+      <h1 className="text-2xl font-bold mb-4 mr-96">Interview Dashboard</h1>
+      {/* <p>Welcome, {session?.user?.email}</p> */}
+      <div className="ml-96">
       <SignOutButton />
+      </div>
+      </div>
       {/* Add more admin dashboard content here */}
       <div className="space-y-6">
         <h1 className="text-3xl font-bold">Welcome, Interviewer</h1>
@@ -29,7 +33,7 @@ export default async function InterViewerDashboard() {
               <CardTitle className="text-sm font-medium">
                 Upcoming Interviews
               </CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+              {/* <Calendar className="h-4 w-4 text-muted-foreground" /> */}
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">3</div>

@@ -15,10 +15,14 @@ export default async function CandidateDashboard() {
   // }
   console.log("secii-->", session);
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Candidate Dashboard</h1>
-      <p>Welcome, {session?.user?.email}</p>
+    <div className="container mx-auto p-4 ">
+      <div className="flex ">
+      <h1 className="text-2xl font-bold mb-4 mr-96">Candidate Dashboard</h1>
+      {/* <p>Welcome, {session?.user?.email}</p> */}
+      <div className="ml-96">
       <SignOutButton />
+      </div>
+      </div>
       {/* Add more admin dashboard content here */}
       <div className="space-y-6">
         <h1 className="text-3xl font-bold">Welcome, John Doe</h1>
@@ -28,7 +32,7 @@ export default async function CandidateDashboard() {
               <CardTitle className="text-sm font-medium">
                 Upcoming Interview
               </CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+              {/* <Calendar className="h-4 w-4 text-muted-foreground" /> */}
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">Frontend Developer</div>
