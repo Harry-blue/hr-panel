@@ -1,51 +1,48 @@
+// middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request: NextRequest) {
-  const path = request.nextUrl.pathname; // e.g., "/login", "/register", "/"
-  console.log('Middleware Path:', path); // Debug: Check what path is being evaluated
+  const path = request.nextUrl.pathname;
+  console.log('Middleware Path:', path);
 
-  // Define public routes
+  // Define public routes that don't require authentication
   const publicPaths = ['/login', '/register', '/forgot-password', '/'];
-  
-  // Normalize path to handle trailing slashes
-  const normalizedPath = path.endsWith('/') && path !== '/' ? path.slice(0, -1) : path;
-  const isPublicPath = publicPaths.includes(normalizedPath);
+  const isPublicPath = publicPaths.includes(path);
   const isApiRoute = path.startsWith('/api');
 
-  // Allow navigation on public routes regardless of authentication status
-  if (isPublicPath && !isApiRoute) {
-    console.log('Public path detected, proceeding:', normalizedPath);
-    return NextResponse.next(); // Explicitly allow navigation to public routes
+  // Allow public paths and API routes to proceed without checks
+  if (isPublicPath || isApiRoute) {
+    console.log(`${isApiRoute ? 'API' : 'Public'} path detected, proceeding:`, path);
+    return NextResponse.next();
   }
 
-  // Handle API routes
-  if (isApiRoute) {
-    console.log('API route detected, proceeding:', path);
-    return NextResponse.next(); // Pass through API requests unchanged
-  }
-
+  // Get session token
   const session = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
-  console.log('Session:', session); // Debug: Check session data
+  console.log('Session:', session);
 
-  // Redirect unauthenticated users from protected routes to login
-  if (!session?.role && !isPublicPath) {
+  // If no session exists, redirect to login for non-public paths
+  if (!session) {
     console.log('Unauthenticated, redirecting to /login from:', path);
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // Role-based path validation for authenticated users
-  if (session?.role) {
-    const rolePath = `/${String(session.role).toLowerCase()}`;
-    const isCorrectPath = path.startsWith(`${rolePath}/`) || path === rolePath;
+  // Define role-based path prefixes
+  const role = session.role as string; // e.g., "CANDIDATE", "ADMIN", "INTERVIEWER"
+  const rolePathPrefix = `/${role.toLowerCase()}`;
+  const dashboardPath = `${rolePathPrefix}/dashboard`;
 
-    if (!isCorrectPath) {
-      console.log(`Role mismatch, redirecting to ${rolePath}/dashboard from:`, path);
-      return NextResponse.redirect(new URL(`${rolePath}/dashboard`, request.url));
-    }
+  // Check if the current path aligns with the user's role
+  const isRolePath = path.startsWith(rolePathPrefix) || path === rolePathPrefix;
+
+  if (!isRolePath) {
+    // User is trying to access a path outside their role, redirect to their dashboard
+    console.log(`Role mismatch, redirecting to ${dashboardPath} from:`, path);
+    return NextResponse.redirect(new URL(dashboardPath, request.url));
   }
 
+  // If the path is correct for the role, proceed
   console.log('No redirects needed, proceeding:', path);
   return NextResponse.next();
 }

@@ -1,76 +1,85 @@
+// app/candidate/dashboard/page.tsx
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
-
-import SignOutButton from "@/components/SignOutButton";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar } from "@/components/ui/calendar";
-import { CheckCircle, Clock } from "lucide-react";
 import { authOptions } from "@/lib/auth";
+import { DashboardCharts } from "./components/dashboard-charts";
+import SignOutButton from "@/components/SignOutButton";
+import { DashboardCards } from "./components/dashboard-card";
+import Header from "@/components/layout/header";
+import { Main } from "@/components/layout/main";
+
+async function getDashboardData(session: any) {
+  const response = await fetch(
+    `${process.env.NEXTAUTH_URL}/api/candidate/dashboard`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-User-Id": session.user.id, // Pass user ID in a custom header
+        "X-User-Role": session.user.role, // Pass user role (note: adjusted to session.role)
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch dashboard data");
+  }
+
+  return response.json();
+}
 
 export default async function CandidateDashboard() {
   const session = await getServerSession(authOptions);
+  if (!session || session.user.role !== "CANDIDATE") {
+    redirect("/auth/signin");
+  }
 
-  // if (!session || session.user.role != "admin") {
-  //   redirect("/");
-  // }
-  console.log("secii-->", session);
+  const dashboardData = await getDashboardData(session);
+
+  // Calculate some candidate-specific stats
+  const calculateChange = (current: number, previous: number) => {
+    if (!previous) return 0;
+    return ((current - previous) / previous) * 100;
+  };
+
+  const stats = {
+    upcomingInterviews: {
+      current: dashboardData.upcomingInterview ? 1 : 0,
+      change: calculateChange(
+        dashboardData.upcomingInterview ? 1 : 0,
+        0 // No previous data for simplicity; adjust if you have historical data
+      ),
+    },
+    profileCompletion: {
+      current: dashboardData.profileCompletion,
+      change: calculateChange(
+        dashboardData.profileCompletion,
+        dashboardData.hasResume ? 75 : 40 // Assume previous completion was lower
+      ),
+    },
+    applicationStatus: {
+      current: dashboardData.upcomingInterview?.status === "SCHEDULED" ? 1 : 0,
+      change: calculateChange(
+        dashboardData.upcomingInterview?.status === "SCHEDULED" ? 1 : 0,
+        0 // No previous data; adjust as needed
+      ),
+    },
+  };
+
   return (
-    <div className="container mx-auto p-4 ">
-      <div className="flex ">
-      <h1 className="text-2xl font-bold mb-4 mr-96">Candidate Dashboard</h1>
-      {/* <p>Welcome, {session?.user?.email}</p> */}
-      <div className="ml-96">
-      <SignOutButton />
+    <>
+      <div className="">
+        <Header />
+        <Main>
+          <div className="space-y-6">
+            <DashboardCards stats={stats} />
+            <DashboardCharts
+              upcomingInterview={dashboardData.upcomingInterview}
+              profileCompletion={dashboardData.profileCompletion}
+            />
+          </div>
+        </Main>
       </div>
-      </div>
-      {/* Add more admin dashboard content here */}
-      <div className="space-y-6">
-        <h1 className="text-3xl font-bold">Welcome, John Doe</h1>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Upcoming Interview
-              </CardTitle>
-              {/* <Calendar className="h-4 w-4 text-muted-foreground" /> */}
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">Frontend Developer</div>
-              <p className="text-xs text-muted-foreground">
-                May 15, 2025 at 2:00 PM
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Application Status
-              </CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">In Progress</div>
-              <p className="text-xs text-muted-foreground">
-                Last updated: 2 days ago
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Profile Completion
-              </CardTitle>
-              <CheckCircle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">85%</div>
-              <p className="text-xs text-muted-foreground">
-                Update your profile for better chances
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
+    </>
   );
 }
