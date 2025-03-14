@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const menuItems = [
-  { title: "Dashboard", icon: Home, href: "/candidate" },
+  { title: "Dashboard", icon: Home, href: "/candidate/dashboard" },
   { title: "Interview Schedule", icon: Calendar, href: "/candidate/schedule" },
   { title: "Notifications", icon: Mail, href: "/candidate/notifications" },
   { title: "Profile", icon: User, href: "/candidate/profile" },
@@ -23,8 +23,7 @@ export function CandidateSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="flex items-center justify-between px-4 py-2">
-        <h2 className="text-lg font-semibold">Candidate Portal</h2>
-        <SidebarTrigger />
+        <h2 className="text-lg font-semibold">Candidate Panel</h2>
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
