@@ -1,4 +1,3 @@
-// middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
@@ -29,12 +28,20 @@ export async function middleware(request: NextRequest) {
   }
 
   // Define role-based path prefixes
-  const role = session.role as string; // e.g., "CANDIDATE", "ADMIN", "INTERVIEWER"
-  const rolePathPrefix = `/${role.toLowerCase()}`;
+  const role = (session.role as string)?.toLowerCase(); // Ensure role is lowercase
+  console.log('Role:', role);
+  if (!role) {
+    console.error('Role is missing in session, redirecting to /login');
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  const rolePathPrefix = `/${role}`;
+  console.log('Role Path Prefix:', rolePathPrefix);
   const dashboardPath = `${rolePathPrefix}/dashboard`;
 
   // Check if the current path aligns with the user's role
-  const isRolePath = path.startsWith(rolePathPrefix) || path === rolePathPrefix;
+  const isRolePath = path.startsWith(rolePathPrefix);
+  console.log('Is Role Path:', isRolePath);
 
   if (!isRolePath) {
     // User is trying to access a path outside their role, redirect to their dashboard

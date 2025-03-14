@@ -28,13 +28,70 @@ async function main() {
     createUser("mobile@example.com", "mobile123", Role.INTERVIEWER, "Mobile Expert", "Mobile Development"),
   ])
 
-  const candidates = await Promise.all([
-    createUser("candidate1@example.com", "cand123", Role.CANDIDATE, "John Doe", undefined, "resume1.pdf"),
-    createUser("candidate2@example.com", "cand456", Role.CANDIDATE, "Jane Smith", undefined, "resume2.pdf"),
-    createUser("candidate3@example.com", "cand789", Role.CANDIDATE, "Bob Wilson", undefined, "resume3.pdf"),
-    createUser("candidate4@example.com", "cand012", Role.CANDIDATE, "Alice Brown", undefined, "resume4.pdf"),
-    createUser("candidate5@example.com", "cand345", Role.CANDIDATE, "Charlie Davis", undefined, "resume5.pdf"),
-  ])
+  // Sample data for candidate profiles
+  const candidateProfiles = [
+    {
+      name: "John Doe",
+      email: "candidate1@example.com",
+      password: "cand123",
+      resume: "resume1.pdf",
+      phone: "123-456-7890",
+      bio: "Passionate software developer with 3 years of experience in web development",
+      skills: ["JavaScript", "React", "Node.js", "TypeScript"]
+    },
+    {
+      name: "Jane Smith",
+      email: "candidate2@example.com",
+      password: "cand456",
+      resume: "resume2.pdf",
+      phone: "234-567-8901",
+      bio: "Backend developer specializing in microservices architecture",
+      skills: ["Java", "Spring Boot", "Docker", "PostgreSQL"]
+    },
+    {
+      name: "Bob Wilson",
+      email: "candidate3@example.com",
+      password: "cand789",
+      resume: "resume3.pdf",
+      phone: "345-678-9012",
+      bio: "Mobile developer with expertise in cross-platform apps",
+      skills: ["Flutter", "Dart", "Android", "iOS"]
+    },
+    {
+      name: "Alice Brown",
+      email: "candidate4@example.com",
+      password: "cand012",
+      resume: "resume4.pdf",
+      phone: "456-789-0123",
+      bio: "Full-stack developer with a focus on scalable web applications",
+      skills: ["Python", "Django", "React", "AWS"]
+    },
+    {
+      name: "Charlie Davis",
+      email: "candidate5@example.com",
+      password: "cand345",
+      resume: "resume5.pdf",
+      phone: "567-890-1234",
+      bio: "Frontend developer passionate about UI/UX design",
+      skills: ["Vue.js", "CSS", "HTML", "Figma"]
+    }
+  ]
+
+  const candidates = await Promise.all(
+    candidateProfiles.map(profile => 
+      createUser(
+        profile.email,
+        profile.password,
+        Role.CANDIDATE,
+        profile.name,
+        undefined,
+        profile.resume,
+        profile.phone,
+        profile.bio,
+        profile.skills
+      )
+    )
+  )
 
   console.log("👥 Users created")
 
@@ -133,6 +190,9 @@ async function createUser(
   name: string,
   specialization?: string,
   resume?: string,
+  phone?: string,
+  bio?: string,
+  skills?: string[] // skills is still an array in the application
 ) {
   const hashedPassword = await bcrypt.hash(password, 10)
 
@@ -158,6 +218,9 @@ async function createUser(
         candidate: {
           create: {
             resume,
+            phone,
+            bio,
+            skills, // Pass the skills array directly; Prisma will serialize it to JSON
           },
         },
       }),
@@ -178,4 +241,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect()
   })
-

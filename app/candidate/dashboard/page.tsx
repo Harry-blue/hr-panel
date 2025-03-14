@@ -22,7 +22,8 @@ async function getDashboardData(session: any) {
   );
 
   if (!response.ok) {
-    throw new Error("Failed to fetch dashboard data");
+    console.log("respp>", response);
+    // throw new Error("Failed to fetch dashboard data");
   }
 
   return response.json();
@@ -73,10 +74,10 @@ export default async function CandidateDashboard() {
         <Main>
           <div className="space-y-6">
             <DashboardCards stats={stats} />
-            <DashboardCharts
+            {/* <DashboardCharts
               upcomingInterview={dashboardData.upcomingInterview}
               profileCompletion={dashboardData.profileCompletion}
-            />
+            /> */}
           </div>
         </Main>
       </div>

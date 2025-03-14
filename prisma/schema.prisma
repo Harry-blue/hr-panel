@@ -53,6 +53,9 @@ model Candidate {
   user       User        @relation(fields: [userId], references: [id])
   userId     Int         @unique
   resume     String?
+  phone      String?
+  bio        String?     @db.Text
+  skills     Json? // Changed from String[]? to Json? for MySQL compatibility
   interviews Interview[]
   feedbacks  Feedback[]
 }
