@@ -23,7 +23,6 @@ async function getProfileData(session: any) {
   );
 
   if (!response.ok) {
-    console.log("in the profikle", response);
     // throw new Error("Failed to fetch profile data");
   }
 
@@ -56,7 +55,6 @@ async function updateProfileData(session: any, formData: FormData) {
   );
 
   if (!response.ok) {
-    console.log("sbd", response);
     // throw new Error("Failed to update profile data");
   }
 

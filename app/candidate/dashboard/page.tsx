@@ -22,7 +22,6 @@ async function getDashboardData(session: any) {
   );
 
   if (!response.ok) {
-    console.log("respp>", response);
     // throw new Error("Failed to fetch dashboard data");
   }
 

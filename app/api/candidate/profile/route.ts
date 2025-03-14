@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
-    console.log("i was called ")
+    
   try {
     // Extract user data from custom headers
     const userId = req.headers.get("x-user-id");
